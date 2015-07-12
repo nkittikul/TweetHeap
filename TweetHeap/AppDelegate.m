@@ -7,8 +7,14 @@
 //
 
 #import "AppDelegate.h"
+#import "TweetTabController.h"
+#import "SavedNavController.h"
+#import "SearchNavController.h"
+#import "SearchViewController.h"
+#import "SavedViewController.h"
 
 @interface AppDelegate ()
+@property (nonatomic, strong) TweetTabController *tweetTabController;
 
 @end
 
@@ -16,7 +22,23 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    self.tweetTabController = [[TweetTabController alloc] init];
+    SearchViewController *search = [[SearchViewController alloc] init];
+    SavedViewController *saved = [[SavedViewController alloc] init];
+    SearchNavController *searchNav = [[SearchNavController alloc] initWithRootViewController:search];
+    SavedNavController *savedNav = [[SavedNavController alloc] initWithRootViewController:saved];
+    savedNav.delegate = saved;
+    NSArray *controllers = [NSArray arrayWithObjects:searchNav,savedNav,nil];
+    self.tweetTabController.viewControllers = controllers;
+    self.tweetTabController.delegate = saved;
+    
+
+    
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     // Override point for customization after application launch.
+    self.window.backgroundColor = [UIColor whiteColor];
+    self.window.rootViewController = self.tweetTabController;
+    [self.window makeKeyAndVisible];
     return YES;
 }
 
