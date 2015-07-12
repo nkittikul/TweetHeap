@@ -14,6 +14,11 @@
 @property (nonatomic, assign) BOOL save;
 @property (nonatomic, assign) BOOL delete;
 @property (nonatomic, strong) Tweet* tweet;
+@property (nonatomic, strong) UILabel* nameLabel;
+@property (nonatomic, strong) UILabel* screenNameLabel;
+@property (nonatomic, strong) UILabel* textLabel;
+@property (nonatomic, strong) UIImageView* imageLabel;
+
 @end
 
 @implementation TweetViewController
@@ -43,31 +48,40 @@
     
 }
 
-- (void)configureSubviews {
+- (void)viewWillLayoutSubviews {
     int height = self.view.bounds.size.height;
     int width = self.view.bounds.size.width;
-    UILabel *nameLabel = [[UILabel alloc] initWithFrame:CGRectMake(width*0.5, height*0.25, width*0.4, height*0.05)];
-    nameLabel.text = self.tweet.name;
-    nameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    UILabel *screenNameLabel = [[UILabel alloc] initWithFrame:CGRectMake(width*0.5, height*0.3, width*0.4, height*0.05)];
-    screenNameLabel.text = [NSString stringWithFormat:@"@%@",self.tweet.screenName];
-    screenNameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    UILabel *textLabel = [[UILabel alloc] initWithFrame:CGRectMake(width*0.2, height*0.4, width*0.6, height*0.4)];
-    textLabel.text = self.tweet.text;
-    textLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    textLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    textLabel.numberOfLines = 0;
-    [textLabel sizeToFit];
+    self.nameLabel.frame = CGRectMake(width*0.5, height*0.25, width*0.4, height*0.05);
+    self.screenNameLabel.frame = CGRectMake(width*0.5, height*0.3, width*0.4, height*0.05);
+    self.textLabel.frame = CGRectMake(width*0.2, height*0.4, width*0.6, height*0.4);
+    self.imageLabel.frame = CGRectMake(width*0.2, height*0.25, width*0.2, height*0.1);
+    
+}
+
+- (void)configureSubviews {
+    self.nameLabel = [[UILabel alloc] init];
+    self.nameLabel.text = self.tweet.name;
+    self.nameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    self.screenNameLabel = [[UILabel alloc] init];
+    self.screenNameLabel.text = [NSString stringWithFormat:@"@%@",self.tweet.screenName];
+    self.screenNameLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    
+    self.textLabel = [[UILabel alloc] init];
+    self.textLabel.text = self.tweet.text;
+    self.textLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    self.textLabel.numberOfLines = 0;
+    [self.textLabel sizeToFit];
+    
     UIImage *image = [UIImage imageWithData:self.tweet.image];
-    UIImageView *imageLabel = [[UIImageView alloc] initWithImage:image];
-    imageLabel.frame = CGRectMake(width*0.2, height*0.25, width*0.2, height*0.1);
-    imageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self.imageLabel = [[UIImageView alloc] initWithImage:image];
+    self.imageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    [self.view addSubview:nameLabel];
-    [self.view addSubview:screenNameLabel];
-    [self.view addSubview:textLabel];
-    [self.view addSubview:imageLabel];
-    
+    [self.view addSubview:self.nameLabel];
+    [self.view addSubview:self.screenNameLabel];
+    [self.view addSubview:self.textLabel];
+    [self.view addSubview:self.imageLabel];
 }
 
 - (void)configureNavItem {
