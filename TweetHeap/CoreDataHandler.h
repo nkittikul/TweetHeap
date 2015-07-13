@@ -11,10 +11,10 @@
 
 @interface CoreDataHandler : NSObject
 
-@property (strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (strong, nonatomic) NSManagedObjectContext *searchMoc;
+@property (strong, nonatomic) NSManagedObjectContext *savedMoc;
 @property (strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
-@property (strong, nonatomic) NSManagedObjectContext *tempMoc;
 
 + (CoreDataHandler *)sharedInstance;
 - (NSURL *)applicationDocumentsDirectory;

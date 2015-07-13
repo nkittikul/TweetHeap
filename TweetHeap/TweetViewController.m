@@ -13,6 +13,7 @@
 @interface TweetViewController ()
 @property (nonatomic, assign) BOOL save;
 @property (nonatomic, assign) BOOL delete;
+@property (nonatomic, assign) BOOL removeFlag;
 @property (nonatomic, strong) Tweet* tweet;
 @property (nonatomic, strong) UILabel* nameLabel;
 @property (nonatomic, strong) UILabel* screenNameLabel;
@@ -28,6 +29,7 @@
         _tweet = tweet;
         _save = YES;
         _delete = NO;
+        _removeFlag = YES;
     }
     return self;
 }
@@ -37,6 +39,7 @@
         _tweet = tweet;
         _save = NO;
         _delete = YES;
+        _removeFlag = NO;
     }
     return self;
 }
@@ -48,12 +51,23 @@
     
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    BOOL returningToResultsViewWithoutSaving = self.removeFlag && [self isMovingFromParentViewController];
+    if (returningToResultsViewWithoutSaving){
+        CoreDataHandler *cdh = [CoreDataHandler sharedInstance];
+        NSManagedObjectContext *moc = [cdh searchMoc];
+        [moc deleteObject:self.tweet];
+    }
+}
+
 - (void)viewWillLayoutSubviews {
     int height = self.view.bounds.size.height;
     int width = self.view.bounds.size.width;
-    self.nameLabel.frame = CGRectMake(width*0.5, height*0.25, width*0.4, height*0.05);
-    self.screenNameLabel.frame = CGRectMake(width*0.5, height*0.3, width*0.4, height*0.05);
-    self.textLabel.frame = CGRectMake(width*0.2, height*0.4, width*0.6, height*0.4);
+    self.nameLabel.frame = CGRectMake(width*0.45, height*0.25, width*0.4, height*0.05);
+    self.screenNameLabel.frame = CGRectMake(width*0.45, height*0.3, width*0.4, height*0.05);
+    self.textLabel.frame = CGRectMake(width*0.2, height*0.4, width*0.6, height*0.6);
+    [self.textLabel sizeToFit];
     self.imageLabel.frame = CGRectMake(width*0.2, height*0.25, width*0.2, height*0.1);
     
 }
@@ -72,10 +86,10 @@
     self.textLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.textLabel.lineBreakMode = NSLineBreakByWordWrapping;
     self.textLabel.numberOfLines = 0;
-    [self.textLabel sizeToFit];
     
     UIImage *image = [UIImage imageWithData:self.tweet.image];
     self.imageLabel = [[UIImageView alloc] initWithImage:image];
+    self.imageLabel.contentMode = UIViewContentModeScaleAspectFit;
     self.imageLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
     [self.view addSubview:self.nameLabel];
@@ -103,23 +117,20 @@
 }
 
 - (void)saveTweet {
+    self.removeFlag = NO;
     CoreDataHandler *cdh = [CoreDataHandler sharedInstance];
-    NSManagedObjectContext *moc = [cdh managedObjectContext];
-    Tweet *tweet = (Tweet *)[NSEntityDescription insertNewObjectForEntityForName:@"Tweet" inManagedObjectContext:moc];
-    tweet.name = self.tweet.name;
-    tweet.screenName = self.tweet.screenName;
-    tweet.text = self.tweet.text;
-    tweet.image = self.tweet.image;
-    tweet.date = [NSDate date];
+    NSManagedObjectContext *moc = [cdh searchMoc];
+    self.tweet.date = [NSDate date];
     NSError *error;
     if ([moc hasChanges] && ![moc save:&error]){
         NSLog(@"Error saving tweet: %@", [error localizedDescription]);
     }
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 - (void)deleteTweet {
     CoreDataHandler *cdh = [CoreDataHandler sharedInstance];
-    NSManagedObjectContext *moc = [cdh managedObjectContext];
+    NSManagedObjectContext *moc = [cdh savedMoc];
     [moc deleteObject:self.tweet];
     NSError *error;
     if ([moc hasChanges] && ![moc save:&error]){

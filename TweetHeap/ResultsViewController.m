@@ -116,15 +116,12 @@
     TweetCell *cell = (TweetCell*) [tableView cellForRowAtIndexPath:indexPath];
     NSDictionary *tweetInfo = [self.tweetsInfo objectAtIndex:indexPath.row];
     CoreDataHandler *cdh = [CoreDataHandler sharedInstance];
-    NSManagedObjectContext *moc = [cdh managedObjectContext];
-    NSManagedObjectContext *tempMoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-    tempMoc.parentContext = moc;
-    cdh.tempMoc = tempMoc;
-    Tweet *tweet = (Tweet *)[NSEntityDescription insertNewObjectForEntityForName:@"Tweet" inManagedObjectContext:tempMoc];
+    NSManagedObjectContext *moc = [cdh searchMoc];
+    Tweet *tweet = (Tweet *)[NSEntityDescription insertNewObjectForEntityForName:@"Tweet" inManagedObjectContext:moc];
     tweet.name = [tweetInfo objectForKey:@"name"];
     tweet.screenName = [tweetInfo objectForKey:@"screen_name"];
     tweet.text = [tweetInfo objectForKey:@"text"];
-    tweet.image = tweet.image = UIImagePNGRepresentation(cell.imageView.image);
+    tweet.image = UIImagePNGRepresentation(cell.imageView.image);
     TweetViewController *tweetViewController = [[TweetViewController alloc] initForSaveWithTweet:tweet];
     [tweetViewController.view setBackgroundColor:[UIColor whiteColor]];
     [self.navigationController pushViewController:tweetViewController animated:YES];

@@ -20,14 +20,16 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[CoreDataHandler alloc] init];
         sharedInstance.persistentStoreCoordinator = [sharedInstance persistentStoreCoordinator];
-        sharedInstance.managedObjectContext = [sharedInstance managedObjectContext];
+        sharedInstance.searchMoc = [sharedInstance searchMoc];
+        sharedInstance.savedMoc = [sharedInstance savedMoc];
     });
     return sharedInstance;
 }
 
 #pragma mark - Core Data stack
 
-@synthesize managedObjectContext = _managedObjectContext;
+@synthesize searchMoc = _searchMoc;
+@synthesize savedMoc = _savedMoc;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 
@@ -75,19 +77,34 @@
 }
 
 
-- (NSManagedObjectContext *)managedObjectContext {
+- (NSManagedObjectContext *)searchMoc {
     // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
-    if (_managedObjectContext != nil) {
-        return _managedObjectContext;
+    if (_searchMoc != nil) {
+        return _searchMoc;
     }
     
     NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
     if (!coordinator) {
         return nil;
     }
-    _managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
-    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-    return _managedObjectContext;
+    _searchMoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+    [_searchMoc setPersistentStoreCoordinator:coordinator];
+    return _searchMoc;
+}
+
+- (NSManagedObjectContext *)savedMoc {
+    // Returns the managed object context for the application (which is already bound to the persistent store coordinator for the application.)
+    if (_savedMoc != nil) {
+        return _savedMoc;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (!coordinator) {
+        return nil;
+    }
+    _savedMoc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+    [_savedMoc setPersistentStoreCoordinator:coordinator];
+    return _savedMoc;
 }
 
 @end

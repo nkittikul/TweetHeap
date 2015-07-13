@@ -28,7 +28,7 @@
 
 - (void)getTweetsInfoFromCoreData {
     CoreDataHandler *cdh = [CoreDataHandler sharedInstance];
-    NSManagedObjectContext *moc = [cdh managedObjectContext];
+    NSManagedObjectContext *moc = [cdh savedMoc];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"Tweet" inManagedObjectContext:moc];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     [request setEntity:entity];
@@ -62,14 +62,6 @@
     cell.detailTextLabel.text = tweet.text;
     cell.imageView.image = image;
     return cell;
-}
-
-#pragma mark - Tab bar controller delegate
-
-- (void)tabBarController:(UITabBarController *)tabBarController didSelectViewController:(UIViewController *)viewController {
-    if (viewController == self.navigationController){
-        [self getTweetsInfoFromCoreData];
-    }
 }
 
 #pragma mark - Navigation controller delegate
